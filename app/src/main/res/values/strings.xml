@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WarehouseManagement</string>
+    <string name="title_login">登录</string>
+
+
+    <string name="et_username_hint">请输入账号</string>
+    <string name="et_userPassword_hint">请输入密码</string>
+    <string name="btn_login">登录</string>
+    <string name="title_connect">通讯连接</string>
+
+    <string name="title_connect_host">服务主机:</string>
+    <string name="title_connect_port">服务端口:</string>
+    <string name="btn_connect_confirm">确认连接</string>
+
+</resources>
