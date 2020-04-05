@@ -29,13 +29,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         initView();
         initData();
     }
-
-    private void initData() {
-        Intent intent = getIntent();
-        Connection connection = (Connection) intent.getSerializableExtra("connection");
-        this.connection = connection;
-    }
-
+    
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -47,6 +41,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             onConnectionChange();
         }
 
+    }
+
+    private void initData() {
+        Intent intent = getIntent();
+        Connection connection = (Connection) intent.getSerializableExtra("connection");
+        this.connection = connection;
     }
 
     private void onConnectionChange() {
