@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--  命名规则：活动名_控件1_控件2_样式  -->
+    <dimen name="toolbar_textSize">22sp</dimen>
+    <!--  命名规则：活动名_控件1..控件2_样式  -->
     <dimen name="connect_tv_et_h">40dp</dimen>
     <dimen name="connect_tv_w">90dp</dimen>
     <dimen name="connect_et_w">180dp</dimen>

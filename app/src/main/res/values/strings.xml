@@ -1,15 +1,19 @@
 <resources>
     <string name="app_name">WarehouseManagement</string>
-    <string name="title_login">登录</string>
+
+    <!--  命名规则：活动名_控件1..控件2_用处  -->
+    <string name="login_toolbar_title">登录</string>
+    <string name="login_et_username_hint">请输入账号</string>
+    <string name="login_et_password_hint">请输入密码</string>
+    <string name="login_btn_text">登录</string>
 
 
-    <string name="et_username_hint">请输入账号</string>
-    <string name="et_userPassword_hint">请输入密码</string>
-    <string name="btn_login">登录</string>
-    <string name="title_connect">通讯连接</string>
+    <string name="connect_toolbar_title">通讯连接</string>
+    <string name="connect_tv_host">服务主机:</string>
+    <string name="connect_tv_port">服务端口:</string>
+    <string name="connect_btn_text">确认连接</string>
 
-    <string name="title_connect_host">服务主机:</string>
-    <string name="title_connect_port">服务端口:</string>
-    <string name="btn_connect_confirm">确认连接</string>
+    <string name="home_toolbar_title">主页</string>
+
 
 </resources>

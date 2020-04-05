@@ -1,8 +1,10 @@
 package com.jetusesoft.warehousemanagement;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -11,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.jetusesoft.warehousemanagement.entity.Connection;
 import com.jetusesoft.warehousemanagement.util.HttpUtil;
 
 public class ConnectActivity extends AppCompatActivity implements View.OnClickListener {
@@ -18,19 +21,30 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     private Toolbar toolbar_connect;
     private Button btn_connect_confirm;
     private EditText et_connect_host, et_connect_port;
-    private boolean isConnectionSuccessful;
+    private Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
         initView();
-        initVariables();
+        initData();
     }
 
-    private void initVariables() {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        setIntent(intent);
+        Connection newConnection = (Connection) intent.getSerializableExtra("connection");
+        if (!this.connection.equals(newConnection)) {
+            this.connection = newConnection;
+        }
+    }
+
+    private void initData() {
         Intent intent = getIntent();
-        this.isConnectionSuccessful = intent.getBooleanExtra("isConnectSuccessful", false);
+        this.connection = (Connection) intent.getSerializableExtra("connection");
     }
 
     private void initView() {
@@ -48,14 +62,10 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) { // 左上角返回箭头点击事件
         if (item.getItemId() == android.R.id.home) {
-//            Intent intent = new Intent(ConnectActivity.this, LoginActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//            startActivity(intent);
-            LoginActivity.actionStart(ConnectActivity.this, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, this.isConnectionSuccessful); // 确保 LoginActivity 的用户输入还在
+            LoginActivity.actionStart(ConnectActivity.this, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, this.connection); // 确保 LoginActivity 的用户输入还在
         }
 
         return super.onOptionsItemSelected(item);
@@ -65,26 +75,35 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_connect_confirm:
-                boolean isConnectSuccessful = HttpUtil.isConnectSuccessful(et_connect_host.getText().toString(), et_connect_port.getText().toString());
+                boolean isConnectSuccessful = HttpUtil.checkConnect(et_connect_host.getText().toString(), et_connect_port.getText().toString());
                 if (isConnectSuccessful) {
-
+                    this.connection.setHost(et_connect_host.getText().toString());
+                    this.connection.setPort(Integer.parseInt(et_connect_port.getText().toString()));
+                    this.connection.setConnectSuccessful(true);
                     // SVProgressHUD = ToastUtil
                     // https://github.com/saiwu-bigkoo/Android-SVProgressHUD
                     new SVProgressHUD(ConnectActivity.this).showSuccessWithStatus("连接成功");
-                    this.isConnectionSuccessful = true;
                     // 进入 LoginActivity
-                    LoginActivity.actionStart(ConnectActivity.this, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, true); // 确保 LoginActivity 的用户输入还在
+                    LoginActivity.actionStart(ConnectActivity.this, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, this.connection); // 确保 LoginActivity 的用户输入还在
 
 
                 } else {
+                    this.connection.setConnectSuccessful(false);
                     new SVProgressHUD(ConnectActivity.this).showErrorWithStatus("连接失败, 主机或端口错误");
                 }
                 break;
         }
     }
 
-    private void handleConnectFail() {
-
+    public static void actionStart(Context context, @Nullable Integer intentFlag, @Nullable Connection connection) {
+        Intent intent = new Intent(context, ConnectActivity.class);
+        if (intentFlag != null) {
+            intent.setFlags(intentFlag);
+        }
+        if (connection != null) {
+            intent.putExtra("connection", connection);
+        }
+        context.startActivity(intent);
     }
 
 }

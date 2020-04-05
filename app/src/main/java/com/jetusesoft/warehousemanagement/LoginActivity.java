@@ -9,44 +9,52 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+
+import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.jetusesoft.warehousemanagement.entity.Connection;
+import com.jetusesoft.warehousemanagement.entity.User;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Toolbar toolbar;
     private Button btn_login;
     private ImageView iv_connect;
-    private boolean isConnectSuccessful;
+    private Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initView();
+        initData();
     }
 
-    private void checkIsConnectSuccessful() {
+    private void initData() {
         Intent intent = getIntent();
-        this.isConnectSuccessful = intent.getBooleanExtra("isConnectSuccessful", false);
-        if (this.isConnectSuccessful) {
-            iv_connect.setImageResource(R.drawable.connected);
-//            iv_connect.setBackgroundResource(R.drawable.connected);
-        }
-
-        else {
-            iv_connect.setImageResource(R.drawable.connect);
-//            iv_connect.setBackgroundResource(R.drawable.connected);
-        }
-
+        Connection connection = (Connection) intent.getSerializableExtra("connection");
+        this.connection = connection;
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        setIntent(intent);
 
-        checkIsConnectSuccessful();
+        setIntent(intent);
+        Connection newConnection = (Connection) intent.getSerializableExtra("connection");
+        if (!this.connection.equals(newConnection)) {
+            this.connection = newConnection;
+            onConnectionChange();
+        }
+
+    }
+
+    private void onConnectionChange() {
+        if (this.connection.isConnectSuccessful()) {
+            iv_connect.setImageResource(R.drawable.connected);
+        } else {
+            iv_connect.setImageResource(R.drawable.connect);
+        }
 
     }
 
@@ -68,27 +76,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_connect:
-                Intent intent = new Intent(LoginActivity.this, ConnectActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT); // 确保 ConnectActivity 的用户输入还在
-                startActivity(intent);
+                ConnectActivity.actionStart(LoginActivity.this, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, this.connection);
                 break;
             case R.id.btn_login:
-
+                if (this.connection.isConnectSuccessful()) {
+                    User user = new User("asd", "123");
+                    HomeActivity.actionStart(LoginActivity.this, Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP, user);
+                    this.finish();
+                } else {
+                    new SVProgressHUD(LoginActivity.this).showErrorWithStatus("登录失败, 服务器未连接");
+                }
                 break;
             default:
                 break;
         }
     }
 
-    public static void actionStart(Context context, @Nullable Integer intentFlag, @Nullable Boolean isConnectSuccessful) {
+    public static void actionStart(Context context, @Nullable Integer intentFlag, @Nullable Connection connection) {
         Intent intent = new Intent(context, LoginActivity.class);
         if (intentFlag != null) {
             intent.setFlags(intentFlag);
         }
-        if (isConnectSuccessful != null) {
-            intent.putExtra("isConnectSuccessful", isConnectSuccessful);
+        if (connection != null) {
+            intent.putExtra("connection", connection);
         }
-
         context.startActivity(intent);
     }
 
